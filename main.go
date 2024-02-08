@@ -9,7 +9,8 @@ import (
 
 func main() {
 	server := Server{8080, http.NewServeMux()}
-	server.mux.HandleFunc("POST /data", server.dataHandler())
+	server.mux.HandleFunc("POST /", server.dataHandler())
+	server.mux.HandleFunc("GET /ping", server.pingHandler())
 
 	addr := fmt.Sprintf("localhost:%v", server.port)
 	log.Printf("Starting Server on %v", addr)
@@ -20,6 +21,14 @@ func main() {
 type Server struct {
 	port int
 	mux  *http.ServeMux
+}
+
+func (server *Server) pingHandler() func(writer http.ResponseWriter, req *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println("pong")
+		w.WriteHeader(200)
+		w.Write([]byte("pong"))
+	}
 }
 
 func (server *Server) dataHandler() func(writer http.ResponseWriter, req *http.Request) {
